@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mis Productos</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+      line-height: 1.5;
+    }
+
+    header {
+      background: #222;
+      color: white;
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+    }
+
+    header p {
+      margin-top: 0.4rem;
+      opacity: 0.8;
+      font-size: 0.95rem;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+
+    .card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      display: block;
+      background: #eee;
+    }
+
+    .card-body {
+      padding: 1.2rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-body h2 {
+      font-size: 1.15rem;
+      margin-bottom: 0.4rem;
+      font-weight: 600;
+    }
+
+    .card-body .price {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #2c7a4b;
+      margin-bottom: 0.6rem;
+    }
+
+    .card-body p {
+      font-size: 0.9rem;
+      color: #666;
+      line-height: 1.45;
+      margin-bottom: 1.2rem;
+      flex-grow: 1;
+    }
+
+    .btn-comprar {
+      background: #25D366;
+      color: white;
+      border: none;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.2s;
+    }
+
+    .btn-comprar:hover {
+      background: #1da851;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: #888;
+      font-size: 0.85rem;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 14px;
+      padding: 1.8rem;
+      width: 100%;
+      max-width: 360px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      animation: fadeIn 0.25s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal h3 {
+      font-size: 1.2rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .modal .producto-nombre {
+      color: #666;
+      font-size: 0.95rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .cantidad-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .cantidad-box button {
+      width: 40px;
+      height: 40px;
+      border: 1px solid #ddd;
+      background: #f8f8f8;
+      border-radius: 8px;
+      font-size: 1.3rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cantidad-box button:hover {
+      background: #eee;
+    }
+
+    .cantidad-box span {
+      font-size: 1.4rem;
+      font-weight: 600;
+      min-width: 30px;
+      text-align: center;
+    }
+
+    .modal-total {
+      text-align: center;
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+    }
+
+    .modal-total span {
+      color: #2c7a4b;
+    }
+
+    .modal-botones {
+      display: flex;
+      gap: 0.8rem;
+    }
+
+    .modal-botones button {
+      flex: 1;
+      padding: 0.8rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-cancelar {
+      background: #f0f0f0;
+      color: #555;
+    }
+
+    .btn-cancelar:hover {
+      background: #e0e0e0;
+    }
+
+    .btn-enviar {
+      background: #25D366;
+      color: white;
+    }
+
+    .btn-enviar:hover {
+      background: #1da851;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Mis Productos</h1>
+    <p>Catálogo personal</p>
+  </header>
+
+  <div class="container">
+    <div class="products" id="productos">
+      <!-- Los productos se insertan aquí con JavaScript -->
+    </div>
+  </div>
+
+  <footer>
+    Página simple de productos · Edita el código para cambiar los productos
+  </footer>
+
+  <!-- Modal de compra -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <h3>¿Cuántas unidades?</h3>
+      <div class="producto-nombre" id="modal-nombre"></div>
+
+      <div class="cantidad-box">
+        <button onclick="cambiarCantidad(-1)">−</button>
+        <span id="cantidad">1</span>
+        <button onclick="cambiarCantidad(1)">+</button>
+      </div>
+
+      <div class="modal-total">
+        Total: <span id="modal-total">$0.00</span>
+      </div>
+
+      <div class="modal-botones">
+        <button class="btn-cancelar" onclick="cerrarModal()">Cancelar</button>
+        <button class="btn-enviar" onclick="enviarWhatsApp()">Enviar pedido</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============================================
+    //  CONFIGURACIÓN
+    // ============================================
+    
+    // Cambia este número por tu WhatsApp (con código de país, sin + ni espacios)
+    // Ejemplo México: 5215512345678
+    // Ejemplo España: 34612345678
+    const WHATSAPP_NUMBER = "5215512345678";  // ← CAMBIA ESTE NÚMERO
+
+
+    // ============================================
+    //  PRODUCTOS (edita aquí)
+    // ============================================
+    const productos = [
+      {
+        nombre: "Camiseta Básica Negra",
+        descripcion: "Camiseta de algodón 100% suave. Corte regular. Ideal para uso diario.",
+        precio: 19.99,
+        imagen: "https://picsum.photos/id/1015/400/300"
+      },
+      {
+        nombre: "Zapatillas Urbanas",
+        descripcion: "Zapatillas cómodas con suela de goma. Perfectas para caminar todo el día.",
+        precio: 49.90,
+        imagen: "https://picsum.photos/id/103/400/300"
+      },
+      {
+        nombre: "Mochila Minimalista",
+        descripcion: "Mochila ligera de 20 litros. Compartimento para laptop y bolsillo frontal.",
+        precio: 34.50,
+        imagen: "https://picsum.photos/id/180/400/300"
+      },
+      {
+        nombre: "Gorra Clásica",
+        descripcion: "Gorra de algodón ajustable. Disponible en varios colores.",
+        precio: 14.99,
+        imagen: "https://picsum.photos/id/1060/400/300"
+      },
+      {
+        nombre: "Reloj Deportivo",
+        descripcion: "Reloj resistente al agua con cronómetro y luz nocturna.",
+        precio: 29.90,
+        imagen: "https://picsum.photos/id/175/400/300"
+      },
+      {
+        nombre: "Botella Térmica",
+        descripcion: "Mantiene bebidas frías 24h y calientes 12h. Capacidad 750 ml.",
+        precio: 22.00,
+        imagen: "https://picsum.photos/id/201/400/300"
+      }
+    ];
+
+    // Variables del modal
+    let productoActual = null;
+    let cantidadActual = 1;
+
+    // Mostrar productos
+    function mostrarProductos() {
+      const contenedor = document.getElementById('productos');
+      
+      productos.forEach((producto, index) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        
+        card.innerHTML = `
+          <img src="${producto.imagen}" alt="${producto.nombre}" loading="lazy">
+          <div class="card-body">
+            <h2>${producto.nombre}</h2>
+            <div class="price">$${producto.precio.toFixed(2)}</div>
+            <p>${producto.descripcion}</p>
+            <button class="btn-comprar" onclick="abrirModal(${index})">
+              Comprar por WhatsApp
+            </button>
+          </div>
+        `;
+        
+        contenedor.appendChild(card);
+      });
+    }
+
+    // Abrir modal
+    function abrirModal(index) {
+      productoActual = productos[index];
+      cantidadActual = 1;
+      
+      document.getElementById('modal-nombre').textContent = productoActual.nombre;
+      document.getElementById('cantidad').textContent = cantidadActual;
+      actualizarTotal();
+      
+      document.getElementById('modal').classList.add('active');
+    }
+
+    // Cerrar modal
+    function cerrarModal() {
+      document.getElementById('modal').classList.remove('active');
+    }
+
+    // Cambiar cantidad
+    function cambiarCantidad(cambio) {
+      cantidadActual += cambio;
+      if (cantidadActual < 1) cantidadActual = 1;
+      if (cantidadActual > 99) cantidadActual = 99;
+      
+      document.getElementById('cantidad').textContent = cantidadActual;
+      actualizarTotal();
+    }
+
+    // Actualizar total
+    function actualizarTotal() {
+      const total = (productoActual.precio * cantidadActual).toFixed(2);
+      document.getElementById('modal-total').textContent = `$${total}`;
+    }
+
+    // Enviar a WhatsApp
+    function enviarWhatsApp() {
+      const total = (productoActual.precio * cantidadActual).toFixed(2);
+      
+      const mensaje = `Hola! Quiero hacer un pedido:\n\n` +
+                      `• Producto: ${productoActual.nombre}\n` +
+                      `• Cantidad: ${cantidadActual}\n` +
+                      `• Precio unitario: $${productoActual.precio.toFixed(2)}\n` +
+                      `• Total: $${total}\n\n` +
+                      `¿Me confirmas disponibilidad?`;
+
+      const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(mensaje)}`;
+      
+      window.open(url, '_blank');
+      cerrarModal();
+    }
+
+    // Cerrar modal al hacer clic fuera
+    document.getElementById('modal').addEventListener('click', function(e) {
+      if (e.target === this) cerrarModal();
+    });
+
+    // Iniciar
+    mostrarProductos();
+  </script>
+
+</body>
+</html>
